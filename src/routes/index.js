@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 
 // Profile
 import UserProfile from "../pages/Authentication/user-profile";
-
+import Masterdata from "../pages/Masterdata/masterdata";
 // Authentication related pages
 import Login from "../pages/Authentication/Login";
 import Logout from "../pages/Authentication/Logout";
@@ -17,6 +17,7 @@ const authProtectedRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
   // //profile
   { path: "/profile", component: <UserProfile /> },
+  { path: "/masterdata", component: <Masterdata /> },
 
   // this route should be at the end of all other routes
   // eslint-disable-next-line react/display-name

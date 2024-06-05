@@ -123,7 +123,7 @@ const SidebarContent = (props) => {
   useEffect(() => {
     new MetisMenu("#side-menu");
     activeMenu();
-  }, []);
+  });
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -152,9 +152,9 @@ const SidebarContent = (props) => {
               </Link>
             </li>
             <li>
-              <Link to="/dashboard">
+              <Link to="/masterdata">
                 <i className="bx bx-home-circle"></i>
-                <span>{props.t("Dashboards")}</span>
+                <span>{props.t("MasterData")}</span>
               </Link>
             </li>
           </ul>
