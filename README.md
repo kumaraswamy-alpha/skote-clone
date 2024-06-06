@@ -4,7 +4,7 @@ Quick Start
 
 clone this repo
 
-cd admin
+cd root-folder
 
 npm install
 
