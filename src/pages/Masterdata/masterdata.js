@@ -10,15 +10,15 @@ const Masterdata = function masterdata() {
       <div className="page-content">
         <div className="container-fluid">
           <div className="row">
-            <div class="col-12 col">
-              <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">MasterData</h4>
-                <div class="page-title-right">
-                  <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item">
+            <div className="col-12 col">
+              <div className="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 className="mb-sm-0 font-size-18">MasterData</h4>
+                <div className="page-title-right">
+                  <ol className="breadcrumb m-0">
+                    <li className="breadcrumb-item">
                       <a href="/dashboard">MasterData</a>
                     </li>
-                    <li class="active breadcrumb-item" aria-current="page">
+                    <li className="active breadcrumb-item" aria-current="page">
                       <a href="/dashboard">MasterData</a>
                     </li>
                   </ol>
