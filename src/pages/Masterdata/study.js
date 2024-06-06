@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { Modal } from "reactstrap";
+import React, { useState, useEffect } from "react"
+import { Modal } from "reactstrap"
+import { version } from "toastr"
 
 function Study() {
-  const [modal_standard, setmodal_standard] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [protocols, setProtocols] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: "protocol_id", direction: "ascending" });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [modal_standard, setmodal_standard] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [protocols, setProtocols] = useState([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [sortConfig, setSortConfig] = useState({
+    key: "protocol_id",
+    direction: "ascending",
+  })
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
   const fetchData = async () => {
     try {
@@ -18,33 +22,33 @@ function Study() {
         headers: {
           "Content-Type": "application/json",
         },
-      });
+      })
 
       if (response.ok) {
-        const result = await response.json();
-        const protocolsData = result.map((item) => item.protocols[0]);
-        setProtocols(protocolsData);
+        const result = await response.json()
+        const protocolsData = result.map(item => item.protocols[0])
+        setProtocols(protocolsData)
       } else {
-        setError(`Error: ${response.statusText}`);
+        setError(`Error: ${response.statusText}`)
       }
     } catch (error) {
-      setError(`Network Error: ${error.message}`);
+      setError(`Network Error: ${error.message}`)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData()
+  }, [])
 
   function tog_standard() {
-    setmodal_standard(!modal_standard);
-    removeBodyCss();
+    setmodal_standard(!modal_standard)
+    removeBodyCss()
   }
 
   function removeBodyCss() {
-    document.body.classList.add("no_padding");
+    document.body.classList.add("no_padding")
   }
 
   const [Data, setData] = useState({
@@ -54,15 +58,15 @@ function Study() {
     version: 1,
     date: "",
     created_by_id: 2,
-  });
+  })
 
   function handleChange(e) {
-    const { name, value } = e.target;
-    setData({ ...Data, [name]: value });
+    const { name, value } = e.target
+    setData({ ...Data, [name]: value })
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async e => {
+    e.preventDefault()
     fetch("http://52.8.28.154:8005/api/protocols", {
       method: "POST",
       headers: {
@@ -71,61 +75,95 @@ function Study() {
       },
       body: JSON.stringify(Data),
     })
-      .then((response) => {
-        setmodal_standard(false);
-        fetchData();
+      .then(response => {
+        setmodal_standard(false)
+        fetchData()
       })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+      .catch(error => {
+        console.log(error)
+      })
+  }
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
-  };
+  const handleSearchChange = e => {
+    setSearchTerm(e.target.value)
+    setCurrentPage(1)
+  }
 
-  const handleSort = (key) => {
-    let direction = "ascending";
+  const handleSort = key => {
+    let direction = "ascending"
     if (sortConfig.key === key && sortConfig.direction === "ascending") {
-      direction = "descending";
+      direction = "descending"
     }
-    setSortConfig({ key, direction });
-  };
+    setSortConfig({ key, direction })
+  }
 
-  const generateSortingIndicator = (key) => {
+  const generateSortingIndicator = key => {
     if (sortConfig.key === key) {
-      return sortConfig.direction === "ascending" ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>;
+      return sortConfig.direction === "ascending" ? (
+        <i className="fas fa-sort-up"></i>
+      ) : (
+        <i className="fas fa-sort-down"></i>
+      )
     }
-    return <i className="fas fa-sort"></i>;
-  };
+    return <i className="fas fa-sort"></i>
+  }
 
   const sortedProtocols = protocols.sort((a, b) => {
     if (a[sortConfig.key] < b[sortConfig.key]) {
-      return sortConfig.direction === "ascending" ? -1 : 1;
+      return sortConfig.direction === "ascending" ? -1 : 1
     }
     if (a[sortConfig.key] > b[sortConfig.key]) {
-      return sortConfig.direction === "ascending" ? 1 : -1;
+      return sortConfig.direction === "ascending" ? 1 : -1
     }
-    return 0;
-  });
-
-  const filteredProtocols = sortedProtocols.filter((protocol) =>
-    protocol.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    return 0
+  })
+  function editProtocol(data) {
+    console.log(data)
+    tog_standard()
+  }
+  function deleteProtocol(data) {
+    console.log(data)
+    tog_standard()
+  }
+  const filteredProtocols = protocols.filter(protocol => {
+    const {
+      title,
+      protocol_id,
+      date,
+      protocol_status_value,
+      protocol_summary,
+      version,
+    } = protocol
+    const lowerSearchTerm = searchTerm
+    return (
+      title.toLowerCase().includes(lowerSearchTerm.toLowerCase()) ||
+      version
+        .toString()
+        .toLowerCase()
+        .includes(lowerSearchTerm.toLowerCase()) ||
+      protocol_id.toLowerCase().includes(lowerSearchTerm.toLowerCase()) ||
+      date.toString().includes(lowerSearchTerm.toString()) ||
+      protocol_status_value
+        .toLowerCase()
+        .includes(lowerSearchTerm.toLowerCase()) ||
+      protocol_summary.toLowerCase().includes(lowerSearchTerm.toLowerCase())
+    )
+  })
 
   const paginatedProtocols = filteredProtocols.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
-  );
+  )
 
-  const totalPages = Math.ceil(filteredProtocols.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredProtocols.length / itemsPerPage)
 
   return (
     <>
       <div className="row">
         <div className="col-md-9">
-          <h5 className="r-red-text mb-3 d-block d-sm-none">Study Design Phase</h5>
+          <h5 className="r-red-text mb-3 d-block d-sm-none">
+            Study Design Phase
+          </h5>
         </div>
         <div className="col-md-3">
           <button
@@ -140,7 +178,10 @@ function Study() {
         </div>
       </div>
       <hr className="mb-4" width="100%"></hr>
-      <div id="datatable_wrapper" className="dataTables_wrapper dt-bootstrap4 no-footer">
+      <div
+        id="datatable_wrapper"
+        className="dataTables_wrapper dt-bootstrap4 no-footer"
+      >
         <div className="row">
           <div className="col-sm-12 col-md-6">
             <div className="dataTables_length" id="datatable_length">
@@ -151,7 +192,7 @@ function Study() {
                   aria-controls="datatable"
                   className="custom-select custom-select-sm form-control form-control-sm"
                   value={itemsPerPage}
-                  onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                  onChange={e => setItemsPerPage(Number(e.target.value))}
                 >
                   <option value="10">10</option>
                   <option value="25">25</option>
@@ -189,7 +230,13 @@ function Study() {
               <thead className="table-light">
                 <tr role="row">
                   <th
-                    className={`sorting ${sortConfig.key === "protocol_id" ? (sortConfig.direction === "ascending" ? "sorting_asc" : "sorting_desc") : ""}`}
+                    className={`sorting ${
+                      sortConfig.key === "protocol_id"
+                        ? sortConfig.direction === "ascending"
+                          ? "sorting_asc"
+                          : "sorting_desc"
+                        : ""
+                    }`}
                     onClick={() => handleSort("protocol_id")}
                   >
                     <div className="cursor-pointer select-none">
@@ -197,7 +244,13 @@ function Study() {
                     </div>
                   </th>
                   <th
-                    className={`sorting ${sortConfig.key === "title" ? (sortConfig.direction === "ascending" ? "sorting_asc" : "sorting_desc") : ""}`}
+                    className={`sorting ${
+                      sortConfig.key === "title"
+                        ? sortConfig.direction === "ascending"
+                          ? "sorting_asc"
+                          : "sorting_desc"
+                        : ""
+                    }`}
                     onClick={() => handleSort("title")}
                   >
                     <div className="cursor-pointer select-none">
@@ -205,15 +258,28 @@ function Study() {
                     </div>
                   </th>
                   <th
-                    className={`sorting ${sortConfig.key === "protocol_summary" ? (sortConfig.direction === "ascending" ? "sorting_asc" : "sorting_desc") : ""}`}
+                    className={`sorting ${
+                      sortConfig.key === "protocol_summary"
+                        ? sortConfig.direction === "ascending"
+                          ? "sorting_asc"
+                          : "sorting_desc"
+                        : ""
+                    }`}
                     onClick={() => handleSort("protocol_summary")}
                   >
                     <div className="cursor-pointer select-none">
-                      Protocol Summary {generateSortingIndicator("protocol_summary")}
+                      Protocol Summary{" "}
+                      {generateSortingIndicator("protocol_summary")}
                     </div>
                   </th>
                   <th
-                    className={`sorting ${sortConfig.key === "version" ? (sortConfig.direction === "ascending" ? "sorting_asc" : "sorting_desc") : ""}`}
+                    className={`sorting ${
+                      sortConfig.key === "version"
+                        ? sortConfig.direction === "ascending"
+                          ? "sorting_asc"
+                          : "sorting_desc"
+                        : ""
+                    }`}
                     onClick={() => handleSort("version")}
                   >
                     <div className="cursor-pointer select-none">
@@ -221,7 +287,13 @@ function Study() {
                     </div>
                   </th>
                   <th
-                    className={`sorting ${sortConfig.key === "date" ? (sortConfig.direction === "ascending" ? "sorting_asc" : "sorting_desc") : ""}`}
+                    className={`sorting ${
+                      sortConfig.key === "date"
+                        ? sortConfig.direction === "ascending"
+                          ? "sorting_asc"
+                          : "sorting_desc"
+                        : ""
+                    }`}
                     onClick={() => handleSort("date")}
                   >
                     <div className="cursor-pointer select-none">
@@ -229,7 +301,13 @@ function Study() {
                     </div>
                   </th>
                   <th
-                    className={`sorting ${sortConfig.key === "protocol_status_value" ? (sortConfig.direction === "ascending" ? "sorting_asc" : "sorting_desc") : ""}`}
+                    className={`sorting ${
+                      sortConfig.key === "protocol_status_value"
+                        ? sortConfig.direction === "ascending"
+                          ? "sorting_asc"
+                          : "sorting_desc"
+                        : ""
+                    }`}
                     onClick={() => handleSort("protocol_status_value")}
                   >
                     <div className="cursor-pointer select-none">
@@ -241,7 +319,7 @@ function Study() {
               </thead>
               <tbody>
                 {paginatedProtocols.map((protocol, index) => (
-                  <tr key={protocol.protocol_id}>
+                  <tr key={index}>
                     <td>{protocol.protocol_id}</td>
                     <td>{protocol.title}</td>
                     <td>{protocol.protocol_summary}</td>
@@ -249,8 +327,18 @@ function Study() {
                     <td>{protocol.date}</td>
                     <td>{protocol.protocol_status_value}</td>
                     <td>
-                      <button className="btn btn-primary btn-sm" onClick={() => editProtocol(protocol)}>Edit</button>
-                      <button className="btn btn-danger btn-sm" onClick={() => deleteProtocol(protocol.protocol_id)}>Delete</button>
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => editProtocol(protocol)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => deleteProtocol(protocol.protocol_id)}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -260,38 +348,80 @@ function Study() {
         </div>
         <div className="row">
           <div className="col-sm-12 col-md-5">
-            <div className="dataTables_info" id="datatable_info" role="status" aria-live="polite">
-              Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredProtocols.length)} to{" "}
-              {Math.min(currentPage * itemsPerPage, filteredProtocols.length)} of {filteredProtocols.length} entries
+            <div
+              className="dataTables_info"
+              id="datatable_info"
+              role="status"
+              aria-live="polite"
+            >
+              Showing{" "}
+              {Math.min(
+                (currentPage - 1) * itemsPerPage + 1,
+                filteredProtocols.length
+              )}{" "}
+              to{" "}
+              {Math.min(currentPage * itemsPerPage, filteredProtocols.length)}{" "}
+              of {filteredProtocols.length} entries
             </div>
           </div>
           <div className="col-sm-12 col-md-7">
-            <div className="dataTables_paginate paging_simple_numbers" id="datatable_paginate">
+            <div
+              className="dataTables_paginate paging_simple_numbers"
+              id="datatable_paginate"
+            >
               <ul className="pagination">
                 <li
-                  className={`paginate_button page-item previous ${currentPage === 1 ? "disabled" : ""}`}
-                  onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+                  className={`paginate_button page-item previous ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
+                  onClick={() =>
+                    currentPage > 1 && setCurrentPage(currentPage - 1)
+                  }
                 >
-                  <a href="#" aria-controls="datatable" data-dt-idx="0" tabIndex="0" className="page-link">
+                  <a
+                    href="#"
+                    aria-controls="datatable"
+                    data-dt-idx="0"
+                    tabIndex="0"
+                    className="page-link"
+                  >
                     Previous
                   </a>
                 </li>
                 {[...Array(totalPages)].map((_, i) => (
                   <li
                     key={i}
-                    className={`paginate_button page-item ${currentPage === i + 1 ? "active" : ""}`}
+                    className={`paginate_button page-item ${
+                      currentPage === i + 1 ? "active" : ""
+                    }`}
                     onClick={() => setCurrentPage(i + 1)}
                   >
-                    <a href="#" aria-controls="datatable" data-dt-idx={i + 1} tabIndex="0" className="page-link">
+                    <a
+                      href="#"
+                      aria-controls="datatable"
+                      data-dt-idx={i + 1}
+                      tabIndex="0"
+                      className="page-link"
+                    >
                       {i + 1}
                     </a>
                   </li>
                 ))}
                 <li
-                  className={`paginate_button page-item next ${currentPage === totalPages ? "disabled" : ""}`}
-                  onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
+                  className={`paginate_button page-item next ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                  onClick={() =>
+                    currentPage < totalPages && setCurrentPage(currentPage + 1)
+                  }
                 >
-                  <a href="#" aria-controls="datatable" data-dt-idx="7" tabIndex="0" className="page-link">
+                  <a
+                    href="#"
+                    aria-controls="datatable"
+                    data-dt-idx="7"
+                    tabIndex="0"
+                    className="page-link"
+                  >
                     Next
                   </a>
                 </li>
@@ -412,7 +542,7 @@ function Study() {
         </form>
       </Modal>
     </>
-  );
+  )
 }
 
-export default Study;
+export default Study
