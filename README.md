@@ -6,6 +6,6 @@ clone this repo
 
 cd root-folder
 
-npm install
+npm install --force
 
 npm start
