@@ -1,4 +1,4 @@
-# skote-theme-react
+# skote-clone
 
 Quick Start
 
